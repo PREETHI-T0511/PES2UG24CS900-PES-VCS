@@ -211,18 +211,40 @@ int index_save(const Index *index) {
     return 0;
 }
 
+int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out);
+extern uint32_t get_file_mode(const char *path);
+
 // Stage a file for the next commit.
-//
-// HINTS - Useful functions and syscalls:
-//   - fopen, fread, fclose             : reading the target file's contents
-//   - object_write                     : saving the contents as OBJ_BLOB
-//   - stat / lstat                     : getting file metadata (size, mtime, mode)
-//   - index_find                       : checking if the file is already staged
-//
-// Returns 0 on success, -1 on error.
 int index_add(Index *index, const char *path) {
-    // TODO: Implement file staging
-    // (See Lab Appendix for logical steps)
-    (void)index; (void)path;
+    FILE *f = fopen(path, "rb");
+    if (!f) return -1;
+    
+    struct stat st;
+    if (fstat(fileno(f), &st) != 0) {
+        fclose(f);
+        return -1;
+    }
+    
+    void *data = malloc(st.st_size);
+    if (!data) {
+        fclose(f);
+        return -1;
+    }
+    
+    if (fread(data, 1, st.st_size, f) != (size_t)st.st_size) {
+        free(data);
+        fclose(f);
+        return -1;
+    }
+    fclose(f);
+    
+    ObjectID hash;
+    if (object_write(OBJ_BLOB, data, st.st_size, &hash) < 0) {
+        free(data);
+        return -1;
+    }
+    free(data);
+
+    // TODO: Implement index updating
     return -1;
 }
