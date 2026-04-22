@@ -153,11 +153,15 @@ static int write_tree_level(IndexEntry *entries, int count, int prefix_len, Obje
                 return -1;
             }
 
-            // TODO: Subtree entry
+            TreeEntry *te = &tree.entries[tree.count++];
+            te->mode = MODE_DIR;
+            te->hash = sub_tree_id;
+            strcpy(te->name, dir_name);
 
             i = j;
         }
     }
+
     return -1;
 }
 
