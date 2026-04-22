@@ -201,6 +201,12 @@ int commit_create(const char *message, ObjectID *commit_id_out) {
         return -1;
     }
 
-    // TODO: parent retrieval
+    if (head_read(&commit.parent) == 0) {
+        commit.has_parent = 1;
+    } else {
+        commit.has_parent = 0;
+    }
+
+    // TODO: metadata
     return -1;
 }
