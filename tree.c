@@ -148,7 +148,12 @@ static int write_tree_level(IndexEntry *entries, int count, int prefix_len, Obje
                 j++;
             }
 
-            // TODO: Recursive call
+            ObjectID sub_tree_id;
+            if (write_tree_level(&entries[i], j - i, prefix_len + dir_len + 1, &sub_tree_id) < 0) {
+                return -1;
+            }
+
+            // TODO: Subtree entry
 
             i = j;
         }
