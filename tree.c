@@ -134,8 +134,23 @@ static int write_tree_level(IndexEntry *entries, int count, int prefix_len, Obje
             strcpy(te->name, curr_path);
             i++;
         } else {
-            // TODO: subdirectories
-            i++;
+            int dir_len = slash - curr_path;
+            char dir_name[256];
+            strncpy(dir_name, curr_path, dir_len);
+            dir_name[dir_len] = '\0';
+
+            int j = i;
+            while (j < count) {
+                const char *next_path = entries[j].path + prefix_len;
+                if (strncmp(next_path, curr_path, dir_len) != 0 || next_path[dir_len] != '/') {
+                    break;
+                }
+                j++;
+            }
+
+            // TODO: Recursive call
+
+            i = j;
         }
     }
     return -1;
