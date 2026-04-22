@@ -245,6 +245,18 @@ int index_add(Index *index, const char *path) {
     }
     free(data);
 
-    // TODO: Implement index updating
-    return -1;
+    IndexEntry *entry = index_find(index, path);
+    if (!entry) {
+        if (index->count >= MAX_INDEX_ENTRIES) return -1;
+        entry = &index->entries[index->count++];
+        strncpy(entry->path, path, sizeof(entry->path) - 1);
+        entry->path[sizeof(entry->path) - 1] = '\0';
+    }
+    
+    entry->mode = get_file_mode(path);
+    entry->hash = hash;
+    entry->mtime_sec = st.st_mtime;
+    entry->size = st.st_size;
+    
+    return index_save(index);
 }
